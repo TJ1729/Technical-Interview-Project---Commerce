@@ -1,0 +1,22 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>
+		{% if watchlist %}Followed {% else %}Active {% endif %}
+		Listings
+		{% if filter_category %} in Category: '{{filter_category}}'{% endif %}
+		{% if filter_kwd %} Matching: '{{filter_kwd}}'{% endif %}
+	</h2>
+	<ul class="list-group">
+		{% for item in all_listings %}
+			<a href="{% url 'listing' id=item.id %}">
+				<li class="list-group-item">
+					<h3>{{item}}</h3>
+					posted: {{item.posted_time}}<br>
+					price: {% if highest_bid %}{{highest_bid.price}}{% else %}{{item.price}}{% endif %}<br>
+					<img src="{{item.picture}}" class="img-fluid">
+				</li>
+			</a>
+		{% endfor %}
+	</ul>
+{% endblock %}

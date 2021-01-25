@@ -1,0 +1,86 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>{{item.title}}</h2>
+		{% if user == item.seller %}
+			<a href="{% url 'saveactive' id=item.id %}"><span class="badge badge-pill badge-secondary">{% if item.active %}Active{% else %}Closed{% endif %}</span></a>
+		{% else %}
+			<span class="badge badge-pill badge-secondary">{% if item.active %}Active{% else %}Closed{% endif %}</span>
+		{% endif %}
+		{% if user.is_authenticated %}
+			{% if watching %}
+				<a href="{% url 'savewatcher' id=item.id %}?froml=True&remove=True"><span class="badge badge-pill badge-secondary">Watching</span></a>
+			{% else %}
+				<a href="{% url 'savewatcher' id=item.id %}?froml=True"><span class="badge badge-pill badge-secondary">Add to watchlist</span></a>
+			{% endif %}
+		{% endif %}
+	<div>
+		{{item.description}}<br>
+		<img class="img-fluid" src="{{item.picture}}">
+	</div>
+	<div>
+		{% if highest_bid %}
+			<h3>£{{highest_bid.price}}</h3>
+			{{item.bids.all.count}} bid(s) so far.
+		{% else %}
+			<h3>£{{item.price}}</h3>
+			0 bid(s) so far.
+		{% endif %}
+		
+		{% if user.is_authenticated %}
+			{% if highest_bid and user.username == highest_bid.buyer %}
+				Your bid is the current bid.
+			{% endif %}
+			<form class="form-inline" action="{% url 'postbid' id=item.id %}" method="post">
+				{% csrf_token %}
+				<input class="form-control" type="number" name="price" placeholder="Enter bid value here..." step="0.01">
+				<div style="padding: 2px"></div>
+				<input class="btn btn-outline-dark" type="submit" value="Place Bid">
+			</form>
+		{% endif %}
+	</div>
+	<div>
+		<h3>Details</h3>
+		{% if item.active %}
+			Active
+		{% else %}
+			Closed
+		{% endif %}
+		<table>
+			<tr>
+				<td>item id:</td>
+				<td>{{item.id}}</td>
+			</tr>
+			<tr>
+				<td>categories:</td>
+				<td>{% for category in item.categories.all %} {{category}},{% endfor %}</td>
+			</tr>
+			<tr>
+				<td>posted by:</td>
+				<td>{{item.seller}}</td>
+			</tr>
+			<tr>
+				<td>posted on:</td>
+				<td>{{item.posted_time}}</td>
+			</tr>
+		</table>
+	</div>
+	<div>
+		<h3>Comments</h3>
+		{% if user.is_authenticated %}
+			<form action="{% url 'postcomment' id=item.id %}" method="post" id="newcomment">
+				{% csrf_token %}
+				<textarea class="form-control" form="newcomment" name="content"></textarea>
+				<input type="submit" value="Post comment">
+			</form>
+		{% endif %}
+		<ul>
+			{% for comment in item.comments.all reversed %}
+				<li>
+					<b>{{comment.user}}</b><br>
+					{{comment.content}}
+				</li>
+			{% endfor %}
+		</ul>
+	</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Categories</h2>
+	{% if messages %}
+		{% for message in messages %}
+			<div class="alert alert-{{message.tags}}">{{message}}</div>
+		{% endfor %}
+	{% endif %}
+	<ul class="list-group">
+		{% for ctgry in ctgry_links %}
+			<li>
+				<a href="{% url 'index' %}?c={{ctgry}}">{{ctgry}}</a>
+			</li>
+		{% endfor %}
+	</ul>
+{% endblock %}
